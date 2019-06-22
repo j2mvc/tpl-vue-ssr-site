@@ -1,0 +1,13 @@
+{
+  "name": "Vue SSR 模板",
+  "short_name": "tvs",
+  "icons": [{
+      "src": "/public/logo.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    }],
+  "start_url": "/",
+  "background_color": "#f2f3f5",
+  "display": "standalone",
+  "theme_color": "#f60"
+}

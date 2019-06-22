@@ -1,0 +1,521 @@
+本文为支持搜索引擎SEO的vue基础模板的Vue+SSR详细安装文档。亲测通过，性能很好，可以作为支持seo的网站项目基础模板。
+
+本文源码git地址：https://github.com/j2mvc/tpl-vue-ssr/
+
+#创建vue-cli项目
+```
+vue create tpl-vue-ssr
+选择Default
+创建完成
+cd tpl-vue-ssr
+添加router
+vue add router
+添加vuex
+vue add vuex
+npm install vuex-router-sync 
+npm install es6-promise
+npm install node-sass  stylus
+```
+#安装依赖
+
+#babel
+```
+https://www.babeljs.cn/docs/usage
+npm install --save-dev @babel/core @babel/cli @babel/preset-env
+npm install --save @babel/polyfill
+```
+#各种loader
+```
+npm install vue-loader vue-style-loader style-loader stylus-loader
+npm install css-loader sass-loader
+```
+
+```
+#eslint
+#https://github.com/browserslist/browserslist-example
+```
+npm install postcss-cli autoprefixer -D
+npm install postcss-preset-env -D
+npm install postcss-normalize -D
+npm install eslint eslint-plugin-compat -D
+```
+
+#修改文件
+#以下为项目创建最初的版本，项目在持续开发中，git源码会更新。此处保持原样。
+1. src/router.js
+
+import Vue from 'vue'
+import Router from 'vue-router'
+
+Vue.use(Router)
+
+export function createRouter() {
+  return new Router({
+    mode: 'history',
+    fallback: false,
+    routes: [
+      {
+        path: '/',
+        name: 'home',
+        component: ()=>import('./views/Home.vue')
+      },
+      {
+        path: '/about',
+        name: 'about',
+        component: ()=>import('./views/About.vue')
+      }
+    ]
+  })
+}
+2. src/main.js
+import Vue from 'vue'
+import App from './App.vue'
+
+import { createRouter } from './router'
+import { createStore } from './store'
+import { sync } from 'vuex-router-sync'
+
+Vue.config.productionTip = false
+
+// 导出一个工厂函数，用于创建新的
+// 应用程序、router 和 store 实例
+export function createApp () {
+
+  // 创建 router 和 store 实例
+  const router = createRouter()
+  const store = createStore()
+
+  // 同步路由状态(route state)到 store
+  sync(store, router)
+
+  // 创建应用程序实例，将 router 和 store 注入
+  const app = new Vue({
+    router,
+    store,
+    render: h => h(App)
+  }).$mount('#app')
+
+
+  // 暴露 app, router 和 store。
+  return { app, router, store }
+}
+// 此处用于仅vue-cli环境运行，运行命令vue-cli-service serve
+// export default createApp();
+
+3. src/views/Home.vue
+<template>
+  <div class="home">
+    <img alt="Vue logo" src="../assets/logo.png">
+    <h1>下面是动态获取的内容</h1>
+    <div v-html="info.html" v-if="info" class="content"></div>
+
+  </div>
+</template>
+
+<script>
+
+export default {
+    components: {
+  },
+  asyncData ({ store, route }) {
+    // 添加同步数据方法，用于服务器渲染
+    // 触发 action 后，会返回 Promise
+    console.log('[home asyncData.]')
+    return store.dispatch('FETCH_INFO',{type:'article'})
+  },
+  computed: {
+      info(){
+        return this.$store.getters.activeData
+      }
+  },
+  mounted(){
+     console.log('[home mounted.]')
+     this.$store.dispatch('FETCH_INFO',{type:'article'});
+   }
+}
+</script>
+4. src/api/index.js
+
+export function getInfo(type){
+    let info = undefined;
+    if(type == 'article') {
+        info = {
+            id: new Date().getTime(),
+            'html': '<h1>这是内容，需要通过浏览器查看网站源代码方法能看到。</h1>'
+        }
+    }
+    if(info != undefined){
+        return Promise.resolve(info);
+    }else {
+        return Promise.resolve();
+    }
+
+}
+5. src/store.js
+import Vue from 'vue'
+import vuex from 'vuex'
+
+import {getInfo} from './api'
+
+Vue.use(vuex)
+
+export function createStore () {
+  return new vuex.Store({
+    state: {
+       type:'',
+       data:{article:{}}
+    },
+    getters:{
+      activeType({type}){
+        return type;
+      },
+      activeData(state,getters){
+        return state.data[getters.activeType]
+
+      }
+    },
+    mutations: {
+      SET_TYPE:(state,{type})=>{
+        state.type = type;
+      },
+      SET_INFO : (state, {type,info}) => {
+        if(info){
+          // 按type为键存入对象
+          Vue.set(state.data, type,info)
+        }
+      }
+    },
+    actions: {
+      FETCH_INFO: ({commit}, {type}) => {
+        return getInfo(type).then(info=>{
+          commit('SET_TYPE', {type} );
+          commit('SET_INFO', {type,info} );
+        })
+      }
+    }
+  })
+}
+5.添加一个外部样式文件
+src/assets/public.css,
+并在App.vue<style>内@import，样式包含.content{color:red}
+<style>改为<style lang="stylus">，因为后面将打包编译。
+
+#运行
+vue-cli-service serve
+在vue-cli环境下运行效果如下，后面将集成SSR，运行效果应该与现在一致，且可以通过浏览器查看源码。s
+须先在main.js添加 export default createApp();
+##以下为集成SSR的配置
+```
+主要是打包的配置。这里引用了官方示例源码。就不能再用vue-cli的打包命令了。需要用webpack打包。
+注释掉main.js内//export default createApp();
+开始打包配置的折磨之旅。
+```
+#打包依赖
+```
+npm install webpack -D 
+npm install webpack-cli -D 
+npm install rimraf -D 
+npm install friendly-errors-webpack-plugin extract-text-webpack-plugin -D 
+npm install webpack-merge webpack-node-externals -D 
+npm install sw-precache-webpack-plugin -D 
+```
+#运行依赖 
+``` 
+npm install express vue-server-renderer route-cache 
+npm install serve-favicon lru-cache compression 
+npm install --save-dev webpack-hot-middleware weback-dev-middleware
+#拷贝官方示例部份源码 
+1.打包配置文件 ``` 
+build/setup-dev-server.js 
+build/webpack.base.config.js 
+build/webpack.client.config.js 
+build/webpack.serer.config.js 
+``` 
+2.server.js 
+3.server/client入口文件 
+``` 
+src/entry-client.js 
+src/entry-server.js 
+``` 
+3.模板文件，用于服务器渲染输出 
+``` 
+src/index.template.html 
+```
+#修改package.json
+```
+  "scripts": {  "dev": "cross-env NODE_ENV=development node server",
+  "start": "cross-env NODE_ENV=production node server",
+  "build": "rimraf dist && npm run build:client && npm run build:server",
+  "build:client": "cross-env NODE_ENV=production webpack --config build/webpack.client.config.js --progress --hide-modules",
+  "build:server": "cross-env NODE_ENV=production webpack --config build/webpack.server.config.js --progress --hide-modules",
+  "postinstall": "npm run build",
+  "lint": "vue-cli-service lint"
+  }
+```
+
+后面即将用到的文档，博文不能发布链接
+ssr官网https://ssr.vuejs.org/zh/
+ssr官网示例源码https://github.com/vuejs/vue-hackernews-2.0/
+webpack插件https://www.webpackjs.com/concepts/plugins/
+``` 
+#运行于开发环境
+npm run dev
+发生错误，在webpack.client.config.js。
+```
+
+
+
+
+Error: webpack.optimize.CommonsChunkPlugin has been removed, please use config.optimization.splitChunks instead.
+提示CommonsChunkPlugin插件已删除，换成splitChunks
+
+解决办法
+
+将2处的webpack.optimize.CommonsChunkPlugin
+
+更改为webpack.optimize.SplitChunksPlugin
+
+再次运行，此处没有报错
+
+```
+
+#修改entry-client.js
+
+```
+
+import { createApp } from './main'
+ // 增加下面绿色的代码，确保能调页asyncData方法
+
+Vue.mixin({
+  beforeRouteUpdate (to, from, next) {
+    const { asyncData } = this.$options
+    if (asyncData) {
+      asyncData({
+        store: this.$store,
+        route: to
+      }).then(next).catch(next)
+    } else {
+      next()
+    }
+  },
+  beforeMount () {
+    const { asyncData } = this.$options
+    if (asyncData) {
+      // 将获取数据操作分配给 promise
+      // 以便在组件中，我们可以在数据准备就绪后
+      // 通过运行 `this.dataPromise.then(...)` 来执行其他任务
+      this.dataPromise = asyncData({
+        store: this.$store,
+        route: this.$route
+      })
+    }
+  }
+})
+
+
+#修改entry-server.js
+
+```
+
+import { createApp } from './main'
+
+```
+
+#修改模板文件
+
+```
+
+把logo-48改为logo，将src/assets/logo.png拷贝public目录下
+
+```
+
+#修改server.js文件
+
+```
+
+app.use(favicon('./public/logo-48.png'))
+
+```
+
+#修改mainfest.json
+
+{
+  "name": "Vue SSR 模板",
+  "short_name": "tvs",
+  "icons": [{
+      "src": "/public/logo.png",
+      "sizes": "120x120",
+      "type": "image/png"
+    }],
+  "start_url": "/",
+  "background_color": "#f2f3f5",
+  "display": "standalone",
+  "theme_color": "#f60"
+}
+#再次运行
+
+```
+
+样式需要安装stylus和stylus-loader,
+
+样式编译通过，提示错误：
+
+UnhandledPromiseRejectionWarning: TypeError: Cannot read property 'renderToString' of undefined
+是刚修改过，需要重启npm run dev
+
+```
+
+typeError: Class constructor LRUCache cannot be invoked without 'new'
+
+插件git地址https://github.com/isaacs/node-lru-cache
+
+最新版的调用方法变了，不用const定义
+
+将const LRU = require('lru-cache')改为
+
+var LRU = require("lru-cache"),
+    options = {
+      max: 500,
+      length: function (n, key) {
+         return n * 2 + key.length },
+      dispose: function (key, n) {
+        n.close()
+      }, maxAge: 1000 * 60 * 60 }
+    , cache = new LRU(options)
+    , otherCache = new LRU(50) // sets just the max size
+再修改引用的地方
+
+
+
+```
+
+提示环境未设置
+
+```
+
+WARNING in configuration
+The 'mode' option has not been set, webpack will fallback to 'production' for this value. Set 'mode' option to 'development' or 'production' to enable defaults for each environment.
+You can also set it to 'none' to disable any default behavior. Learn more: https://webpack.js.org/configuration/mode/
+
+解决方法
+
+在build/webpack.base.config.js内添加
+
+module.exports = {
+  mode:isProd?'production':'none',
+```
+
+#修改home.vue。
+
+注释掉mounted()方法。
+
+// mounted(){
+//   console.log('[home created.]')
+//   this.$store.dispatch('FETCH_INFO',{type:'article'});
+// }
+再次运行npm run dev，看到了让人心情舒畅的绿色：
+
+现在的页面效果如下：
+
+
+
+用浏览器查看源码，效果如下，正是我们需要的结果：
+
+
+##现在开发环境可以了，测试发布。
+
+```
+
+npm run build
+
+报错，混淆工具UglifyjsWebpackPlugin报错，需要更新到新版：
+
+Error: webpack.optimize.UglifyJsPlugin has been removed, please use config.optimization.minimize instead.
+    at Object.get [as UglifyJsPlugin] (D:\works\gitrepos\tpl\tpl-vue-ssr\node_modules\webpack\lib\webpack.js:187:10)
+    at Object.<anonymous> (D:\works\gitrepos\tpl\tpl-vue-ssr\build\webpack.base.config.js:72:30)
+    at Module._compile (D:\works\gitrepos\tpl\tpl-vue-ssr\node_modules\v8-compile-cache\v8-compile-cache.js:192:30)
+
+
+
+解决办法：
+
+npm install npm install uglifyjs-webpack-plugin --save-dev
+移除new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false } }),
+
+在和plugins同级增加
+
+optimization: {
+  minimizer: [
+    new UglifyJsPlugin({
+      uglifyOptions: {
+        warnings: false
+      },
+    }),
+  ],
+},
+```
+
+#错误optimization unnamed ：
+
+```
+
+ 10% building 0/0 modules 0 active(node:9488) DeprecationWarning: Tapable.plugin is deprecated. Use new API on `.hooks` instead
+ 78% module and chunk tree optimization unnamed compat pluginD:\works\gitrepos\tpl\tpl-vue-ssr\node_modules\webpack\lib\Chunk.js:857
+Error: Chunk.entrypoints: Use Chunks.groupsIterable and filter by instanceof Entrypoint instead
+
+解决办法
+
+npm install --save-dev extract-text-webpack-plugin@next
+
+```
+
+#样式编译错误：
+
+Module build failed (from ./node_modules/css-loader/dist/cjs.js):
+    ValidationError: CSS Loader Invalid Options
+
+    options should NOT have additional properties
+
+
+解决办法：
+
+修改hbuild/webpack.base.config.js
+
+extract-text-webpack-plugin仅支持webpack3以下，换成
+
+npm install --save-dev mini-css-extract-plugin
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const isProd = process.env.NODE_ENV === 'production'
+    rules: [{
+  test: /\.(sa|sc|c)ss$/,
+  use: [
+    {
+      loader: MiniCssExtractPlugin.loader,
+      options: {
+        hmr: process.env.NODE_ENV === 'development',
+      },
+    },
+    'css-loader',
+    'postcss-loader',
+    'sass-loader',
+  ],
+}]
+plugins:[
+
+new MiniCssExtractPlugin({
+  // Options similar to the same options in webpackOptions.output
+  // both options are optional
+  filename: !isProd ? '[name].css' : '[name].[hash].css',
+  chunkFilename: !isProd  ? '[id].css' : '[id].[hash].css',
+})
+]
+
+
+
+编译通过
+
+npm run start，
+
+响应非常快速，与dev模式一样。
+
+到此，vue集成ssr已初步完成。完全可以放心的用vue做网站，不用担搜索seo的问题。
