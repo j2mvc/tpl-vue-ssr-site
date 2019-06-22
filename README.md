@@ -1,4 +1,4 @@
-#VueSSR基础模板
+#VueSSR网站模板
 
 #安装
 npm install
@@ -12,10 +12,6 @@ npm build
 #运行
 npm run start
 
-#详细说明
-见docs/安装文档.md
 
 
-#Build Setup
-#引入现有项目
-npm install tpl-vue-ssr
+
