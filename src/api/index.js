@@ -1,16 +1,48 @@
+/**
+ * API调用方法：api.common.ad.getList
+ */
+// 查找modules目录下的所有目录js文件
+const files = require.context("./modules", true,  /\.js$/)
 
-export function getInfo(type){
-    let info = undefined;
-    if(type == 'info') {
-        info = {
-            id: new Date().getTime(),
-            'html': '<h1>这是内容，需要通过浏览器查看网站源代码方法能看到。</h1>'
+const modules = {}
+
+/**
+ * 读取模块
+ * @param ks
+ * @param value
+ * @param modules
+ * @param i
+ * @param len
+ * @returns {*|{}}
+ */
+export function getModule(ks,value,modules,i,len){
+    modules = modules || {};
+    if(i<len){
+        if(i == len -1){
+            // 最后一层，赋值
+            modules[ks[len -1]] = value;
+        }else{
+            let m = modules[ ks[i]] || {}
+            modules[ ks[i]] = m;
+
+            i++
+
+            getModule(ks,value,m,i,len)
         }
     }
-    if(info != undefined){
-        return Promise.resolve(info);
-    }else {
-        return Promise.resolve();
-    }
+    return modules;
+}
 
+files.keys().forEach(key => {
+    let k = key.replace(/(\.\/|\.js)/g, '').replace(/(\/)$/g,'');
+    let ks = k.split('/');
+    if(ks.length > 1){
+        // 有子模块
+        getModule(ks,files(key).default,modules,0,ks.length)
+    }else{
+        modules[k] = files(key).default
+    }
+})
+export default {
+   modules
 }
