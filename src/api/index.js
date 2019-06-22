@@ -1,6 +1,7 @@
 /**
  * API调用方法：api.common.ad.getList
  */
+
 // 查找modules目录下的所有目录js文件
 const files = require.context("./modules", true,  /\.js$/)
 
@@ -43,6 +44,7 @@ files.keys().forEach(key => {
         modules[k] = files(key).default
     }
 })
+
 export default {
    modules
 }

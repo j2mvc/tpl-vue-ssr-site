@@ -12,14 +12,6 @@ function errorCreate(msg) {
 
 // 记录和显示错误
 function errorLog(error) {
-    // 添加到日志
-    store.dispatch('d2admin/log/push', {
-        message: '数据请求异常',
-        type: 'danger',
-        meta: {
-            error
-        }
-    })
     // 打印到控制台
     if (process.env.NODE_ENV === 'development') {
         util.log.danger('>>>>>> Error >>>>>>')
