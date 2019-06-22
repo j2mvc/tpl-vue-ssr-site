@@ -5,7 +5,11 @@ import { createRouter } from './router'
 import { createStore } from './store'
 import { sync } from 'vuex-router-sync'
 
+import util from "./util";
+
 Vue.config.productionTip = false
+
+Vue.prototype.$util = util;
 
 // 导出一个工厂函数，用于创建新的
 // 应用程序、router 和 store 实例

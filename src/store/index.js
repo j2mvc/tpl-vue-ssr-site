@@ -8,6 +8,9 @@ Vue.use(vuex)
 export function createStore () {
 
   return new vuex.Store({
+    namespaced:true,
+    state: {
+    },
     modules
   })
 }
