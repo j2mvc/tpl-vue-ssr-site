@@ -1,6 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
+const proxy= require('http-proxy-middleware');
 const favicon = require('serve-favicon')
 const compression = require('compression')
 const microcache = require('route-cache')
@@ -15,7 +16,7 @@ const serverInfo =
 
 const app = express()
 
-var LRU = require("lru-cache"),
+const LRU = require("lru-cache"),
     options = {
       max: 500,
       length: function (n, key) {
@@ -24,7 +25,6 @@ var LRU = require("lru-cache"),
         n.close()
       }, maxAge: 1000 * 60 * 60 }
     , cache = new LRU(options)
-    , otherCache = new LRU(50) // sets just the max size
 
 function createRenderer (bundle, options) {
   // https://github.com/vuejs/vue/blob/dev/packages/vue-server-renderer/README.md#why-use-bundlerenderer
@@ -69,6 +69,14 @@ if (isProd) {
 const serve = (path, cache) => express.static(resolve(path), {
   maxAge: cache && isProd ? 1000 * 60 * 60 * 24 * 30 : 0
 })
+
+/** 代理设置 */
+app.use('/api',proxy({
+  target: 'http://api.ptjp.gov.cn',
+  changeOrigin: true,
+  ws: true,
+  pathRewrite: { '^/api': '/' }
+}));
 
 app.use(compression({ threshold: 0 }))
 app.use(favicon('./public/logo.png'))
@@ -124,7 +132,8 @@ app.get('*', isProd ? render : (req, res) => {
   readyPromise.then(() => render(req, res))
 })
 
-const port = process.env.PORT || 8080
+/** 启动 */
+const port = process.env.PORT || 80
 app.listen(port, () => {
   console.log(`server started at localhost:${port}`)
 })

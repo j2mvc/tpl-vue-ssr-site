@@ -7,7 +7,10 @@ export default {
     namespaced:true,
     state: {
         type:'',
-        data:{list:{}}
+        error:{},
+        data:{
+            list:[]
+        }
     },
     getters,
     mutations,

@@ -1,8 +1,13 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+  <div class="page">
     <h1>下面是动态获取的内容{{isMobile?'是手机端':'是PC端'}}</h1>
+    <div class="error">分类接口错误：{{error}}</div>
     <div v-html="info.html" v-if="info" class="content"></div>
+    <div class="cats">
+      <div v-for="item in cats" class="list-item" :key="item.id">
+        <div>{{item.name}}</div>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -20,17 +25,12 @@ export default {
       isMobile:true
     }
   },
-  asyncData ({ store, route }) {
-    // 添加同步数据方法，用于服务器渲染
-    // 触发 action 后，会返回 Promise
-    console.log('[home asyncData.]')
-
-    return store.dispatch('ssrTest/fetchInfo',{type:'info'})
-  },
   computed:{
     ...mapState({
     }),
    ...mapGetters({
+      error:'content/cat/getError',
+       cats:'content/cat/getList',
        info:'ssrTest/getInfo'
     })
 

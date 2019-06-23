@@ -11,7 +11,7 @@ export default {
         if (info != undefined) {
             return Promise.resolve(info);
         } else {
-            return Promise.resolve();
+            return Promise.reject();
         }
     }
 }

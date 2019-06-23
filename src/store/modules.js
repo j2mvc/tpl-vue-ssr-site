@@ -26,11 +26,12 @@ export function getModule(ks,value,modules,i,len){
       }else if(modules[ ks[i]]){
         let pm = modules[ ks[i]];
         m = pm['modules'];
+        pm['namespaced'] = true;
       }else{
-
         let pm = modules[ ks[i]] || {}
         modules[ ks[i]] = pm;
         pm['modules'] = m
+        pm['namespaced'] = true;
       }
 
       i++
