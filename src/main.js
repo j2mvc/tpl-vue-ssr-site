@@ -6,12 +6,14 @@ import { sync } from 'vuex-router-sync'
 
 Vue.config.productionTip = false
 
+import App from './views/pc/App.vue';
+
 export function getApp() {
-    const util = require("./lib/util");
-    if(util.isMobile()){
-      return require('./views/mobile/App.vue');
-    }
-    return require('./views/pc/App.vue');
+    // const util = require("./lib/util");
+    // if(util.isMobile()){
+    //   return require('./views/mobile/App.vue');
+    // }
+    return App;
 }
 
 // Vue.mixin(util)

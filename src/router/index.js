@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import {getModule} from "../store/modules";
 
 Vue.use(Router)
 

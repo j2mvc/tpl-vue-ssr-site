@@ -35,7 +35,7 @@ const service = axios.create({
     // 如果请求话费了超过 `timeout` 的时间，请求将被中断
     timeout: 5000,
     // `withCredentials` 表示跨域请求时是否需要使用凭证
-    withCredentials: true, // 默认值为false
+    // withCredentials: false, // 默认值为false
     // `url` 是用于请求的服务器 URL
 
     // `paramsSerializer` 是一个负责 `params` 序列化的函数
@@ -58,26 +58,26 @@ const service = axios.create({
     // `xsrfHeaderName` 是承载 xsrf token 的值的 HTTP 头的名称
     // xsrfHeaderName: 'X-XSRF-TOKEN', // 默认的
     // `onUploadProgress` 允许为上传处理进度事件
-    onUploadProgress: function (progressEvent) {
-        // 对原生进度事件的处理
-    },
+    // onUploadProgress: function (progressEvent) {
+    //     // 对原生进度事件的处理
+    // },
 
     // `onDownloadProgress` 允许为下载处理进度事件
-    onDownloadProgress: function (progressEvent) {
-        // 对原生进度事件的处理
-    },
+    // onDownloadProgress: function (progressEvent) {
+    //     // 对原生进度事件的处理
+    // },
 
     // `maxContentLength` 定义允许的响应内容的最大尺寸
     // maxContentLength: 2000,
 
     // `validateStatus` 定义对于给定的HTTP 响应状态码是 resolve 或 reject  promise 。如果 `validateStatus` 返回 `true` (或者设置为 `null` 或 `undefined`)，promise 将被 resolve; 否则，promise 将被 rejecte
-    validateStatus: function (status) {
-        return status >= 200 && status < 300; // 默认的
-    },
+    // validateStatus: function (status) {
+    //     return status >= 200 && status < 300; // 默认的
+    // },
 
     // `maxRedirects` 定义在 node.js 中 follow 的最大重定向数目
     // 如果设置为0，将不会 follow 任何重定向
-    maxRedirects: 5, // 默认的
+    // maxRedirects: 5, // 默认的
 
     // `httpAgent` 和 `httpsAgent` 分别在 node.js 中用于定义在执行 http 和 https 时使用的自定义代理。允许像这样配置选项：
     // `keepAlive` 默认没有启用
@@ -181,7 +181,7 @@ service.interceptors.response.use(function (response) {
     return Promise.reject(error);
 });
 
-const apikey = 'myapikey'
+const apikey = '66bb75d01825f4e06963dd645d901bbe'
 // request.get(url,params,true)
 // request.post(url,data,false)
 

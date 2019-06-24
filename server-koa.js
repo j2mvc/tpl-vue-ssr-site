@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const express = require('express')
+const Koa = require('koa')
 const proxy= require('http-proxy-middleware');
 const favicon = require('serve-favicon')
 const compression = require('compression')
@@ -14,7 +14,7 @@ const serverInfo =
   `express/${require('express/package.json').version} ` +
   `vue-server-renderer/${require('vue-server-renderer/package.json').version}`
 
-const app = express()
+const app = new Koa();
 
 const LRU = require("lru-cache"),
     options = {
@@ -127,6 +127,14 @@ function render (req, res) {
     }
   })
 }
+
+app.use((ctx, next) => {
+    const start = Date.now();
+    return next().then(() => {
+        const ms = Date.now() - start;
+        console.log(`${ctx.method} ${ctx.url} - ${ms}ms`);
+    });
+});
 
 app.get('*', isProd ? render : (req, res) => {
   readyPromise.then(() => render(req, res))

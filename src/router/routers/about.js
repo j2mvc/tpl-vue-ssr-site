@@ -1,9 +1,9 @@
-
+import view from '../../views/pc/About.vue'
 export function getView() {
-    const util = require('../../lib/util');
-    if(util.isMobile())
-        return require('../../views/mobile/About.vue');
-    return require('../../views/pc/About.vue');
+    // const util = require('../../lib/util');
+    // if(util.isMobile())
+    //     return require('../../views/mobile/About.vue');
+    return view;
 }
 
 // 这是一个用于动态创建视图的工厂函数，
@@ -13,11 +13,8 @@ export function createView () {
         name: `home-stories-view`,
         title: '关于',
 
-        computed:{
-            view :getView()
-        },
         render (h) {
-            return h(this.view)
+            return h(getView())
         }
     }
 }

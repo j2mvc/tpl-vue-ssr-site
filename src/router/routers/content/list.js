@@ -1,12 +1,14 @@
+import view from '../../../views/pc/content/List.vue'
+
 const camelize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
 const type = '201412290840356913'
 
 export function getView() {
-    const util = require('../../../lib/util');
-    if(util.isMobile())
-        return require('../../../views/mobile/content/List.vue');
-    return require('../../../views/pc/content/List.vue');
+    // const util = require('../../../lib/util');
+    // if(util.isMobile())
+    //     return require('../../../views/mobile/content/List.vue');
+    return view;
 }
 
 // 这是一个用于动态创建视图的工厂函数，
@@ -23,12 +25,9 @@ export function createView () {
 
         title: camelize(type),
 
-        computed:{
-            view :getView()
-        },
 
         render (h) {
-            return h(this.view)
+            return h(getView())
         }
     }
 }

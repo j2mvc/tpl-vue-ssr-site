@@ -13,7 +13,6 @@ npm install element-ui
 npm install md5
 npm install js-cookie
 npm install http-proxy-middleware
-npm install axios-mock-adapter --save-dev
 ```
 
 
@@ -33,3 +32,6 @@ npm install axios-mock-adapter --save-dev
 想做更灵活的路由控制，在页渲染之前判断浏览器类型，却发现无法获取navigator对象，这很坑啊。
 无奈，试试nuxtjs吧。
 该项目暂停开发。
+
+# 使用koa
+npm install babel-register babel-preset-env --save
