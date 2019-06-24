@@ -19,11 +19,11 @@ function errorLog(error) {
         console.log(error)
     }
     // 显示提示
-    Message({
-        message: error.message,
-        type: 'error',
-        duration: 5 * 1000
-    })
+    // Message({
+    //     message: error.message,
+    //     type: 'error',
+    //     duration: 5 * 1000
+    // })
 }
 
 // 创建一个 axios 实例

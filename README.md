@@ -31,5 +31,5 @@ npm install axios-mock-adapter --save-dev
 
 # 结语
 想做更灵活的路由控制，在页渲染之前判断浏览器类型，却发现无法获取navigator对象，这很坑啊。
-无奈，试试nextjs吧。
+无奈，试试nuxtjs吧。
 该项目暂停开发。

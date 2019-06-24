@@ -1,10 +1,9 @@
-import util from '../../../lib/util'
-
 const camelize = str => str.charAt(0).toUpperCase() + str.slice(1)
 
 const type = '201412290840356913'
 
 export function getView() {
+    const util = require('../../../lib/util');
     if(util.isMobile())
         return require('../../../views/mobile/content/List.vue');
     return require('../../../views/pc/content/List.vue');
@@ -24,8 +23,12 @@ export function createView () {
 
         title: camelize(type),
 
+        computed:{
+            view :getView()
+        },
+
         render (h) {
-            return h(getView())
+            return h(this.view)
         }
     }
 }

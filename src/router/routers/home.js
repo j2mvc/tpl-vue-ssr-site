@@ -1,6 +1,6 @@
-import util from '../../lib/util'
 
 export function getView() {
+    const util = require('../../lib/util');
     if(util.isMobile())
         return require('../../views/mobile/Home.vue');
     return require('../../views/pc/Home.vue');
@@ -13,6 +13,7 @@ export function createView () {
         name: `home-stories-view`,
 
         asyncData ({ store, route }) {
+            console.log('asyncData util.isMobile ',require('../../lib/util').isMobile())
             // 添加同步数据方法，用于服务器渲染
             // 触发 action 后，会返回 Promise
             return Promise.all([
@@ -21,10 +22,14 @@ export function createView () {
             ])
         },
 
+        computed:{
+            view :getView()
+        },
+
         title: '首页',
 
         render (h) {
-            return h(getView())
+            return h(this.view)
         }
     }
 }
