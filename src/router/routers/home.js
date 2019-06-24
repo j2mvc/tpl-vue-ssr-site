@@ -1,7 +1,9 @@
-import view from '../../views/Home.vue'
+import util from '../../lib/util'
 
 export function getView() {
-    return view;
+    if(util.isMobile())
+        return require('../../views/mobile/Home.vue');
+    return require('../../views/pc/Home.vue');
 }
 
 // 这是一个用于动态创建视图的工厂函数，
@@ -13,7 +15,6 @@ export function createView () {
         asyncData ({ store, route }) {
             // 添加同步数据方法，用于服务器渲染
             // 触发 action 后，会返回 Promise
-            console.log('[home asyncData.]')
             return Promise.all([
                 store.dispatch('content/cat/fetchList', { type:'201412290840356913' }),
                 store.dispatch('ssrTest/fetchInfo',{type:'info'})

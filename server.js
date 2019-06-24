@@ -72,7 +72,7 @@ const serve = (path, cache) => express.static(resolve(path), {
 
 /** 代理设置 */
 app.use('/api',proxy({
-  target: 'http://api.ptjp.gov.cn',
+  target: 'http://www.j2mvc.com',
   changeOrigin: true,
   ws: true,
   pathRewrite: { '^/api': '/' }
@@ -133,7 +133,7 @@ app.get('*', isProd ? render : (req, res) => {
 })
 
 /** 启动 */
-const port = process.env.PORT || 80
+const port = process.env.PORT || 8080
 app.listen(port, () => {
   console.log(`server started at localhost:${port}`)
 })

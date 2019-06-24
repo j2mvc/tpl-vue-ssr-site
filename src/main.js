@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import App from './App.vue'
 
 import { createRouter } from './router'
 import { createStore } from './store'
@@ -9,6 +8,13 @@ Vue.config.productionTip = false
 
 import util from "./lib/util";
 Vue.prototype.$util = util;
+
+export function getApp() {
+    if(util.isMobile()){
+      return require('./views/mobile/App.vue');
+    }
+    return require('./views/pc/App.vue');
+}
 
 // 导出一个工厂函数，用于创建新的
 // 应用程序、router 和 store 实例
@@ -25,7 +31,7 @@ export function createApp () {
   const app = new Vue({
     router,
     store,
-    render: h => h(App)
+    render: h => h(getApp())
   }).$mount('#app')
 
 
