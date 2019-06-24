@@ -17,4 +17,4 @@ if (process.__API__) {
     }
 }
 
-module.exports = config
+export default config
