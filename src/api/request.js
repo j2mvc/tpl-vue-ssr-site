@@ -181,10 +181,6 @@ service.interceptors.response.use(function (response) {
     return Promise.reject(error);
 });
 
-const apikey = '66bb75d01825f4e06963dd645d901bbe'
-// request.get(url,params,true)
-// request.post(url,data,false)
-
 export default {
 
     async get({url,params,cache}){
@@ -193,8 +189,6 @@ export default {
         if (config.cached && config.cached.has(key)) {
             return config.cached.get(key)
         }
-        // 这会在应用中暴露
-        params.apikey = apikey
         return new Promise((resolve, reject) => {
             service({
                 method: 'get',
