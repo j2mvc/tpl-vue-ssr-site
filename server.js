@@ -72,7 +72,7 @@ const serve = (path, cache) => express.static(resolve(path), {
 
 /** 代理设置 */
 app.use('/api',proxy({
-  target: 'http://api.ptjp.gov.cn:80',
+  target: 'http://api.j2mvc.com:80',
   changeOrigin: true,
   ws: true,
   pathRewrite: { '^/api': '/' }
