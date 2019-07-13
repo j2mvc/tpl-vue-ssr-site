@@ -29,9 +29,15 @@ npm install http-proxy-middleware
 ```
 
 # 结语
-想做更灵活的路由控制，在页渲染之前判断浏览器类型，却发现无法获取navigator对象，这很坑啊。
+不推荐使用。
+想做更灵活的路由控制，在页面渲染之前判断浏览器类型，却发现无法获取navigator对象，这很坑啊。
 无奈，试试nuxtjs吧。
 该项目暂停开发。
 
+
 # 使用koa
 npm install babel-register babel-preset-env --save
+
+# 建议
+使用过nuxtjs，能实现服务器端渲染，但个人感觉这是基于vue改造的框架，改了一些特性，开发上有些束缚。
+后使用nextjs，基于react语言，使用了react redux，感觉良好，没有束缚，可以做你想做的任何炫酷的事情，推荐使用。
